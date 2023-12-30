@@ -1,8 +1,23 @@
 const express = require("express");
 
+const morgan = require("morgan");
+
 const app = express();
 
-const persons = [
+app.use(express.json());
+
+morgan.token("reqbody", function (req, res) {
+  const body = req.body;
+  return JSON.stringify(body);
+});
+
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :reqbody"
+  )
+);
+
+let persons = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -25,7 +40,63 @@ const persons = [
   },
 ];
 
-app.get("/api/persons");
+app.get("/info", (request, response) => {
+  const info = `<p>Phonebook has info for ${persons.length} people</p>`;
+  const timeStamp = `${new Date().toString()}`;
+  response.send(`${info} ${timeStamp}`);
+});
+
+app.get("/api/persons", (request, response) => {
+  response.json(persons);
+});
+
+app.get("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const person = persons.find((p) => p.id === id);
+  return person ? res.json(person) : res.status(404).end();
+});
+
+app.delete("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  persons = persons.filter((p) => p.id !== id);
+  res.status(204).end();
+});
+
+app.post("/api/persons/", (request, response) => {
+  const body = request.body;
+
+  if (body ? !body.name || !body.number : false) {
+    return response.status(400).json({
+      error: `missing ${
+        body
+          ? body.name
+            ? "person number"
+            : body.number
+            ? "person name"
+            : "person name and number"
+          : "body"
+      }`,
+    });
+  }
+
+  if (persons.find((p) => p.name === body.name)) {
+    return response.status(400).json({
+      error: "name must be unique",
+    });
+  }
+
+  const newId = Math.round(Math.random() * 1000000);
+
+  const person = {
+    id: newId,
+    name: body.name,
+    number: body.number,
+  };
+
+  persons = persons.concat(person);
+
+  response.json(person);
+});
 
 const PORT = 3001;
 
