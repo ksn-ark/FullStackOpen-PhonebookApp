@@ -1,2 +1,4 @@
-# FullStackOpen-Part-3
-Course work for full stack open part 3
+Phonebook application made using vite & react for frontend and node/express for backend
+
+Deployed link :
+https://phonebookapp-on2l.onrender.com/
