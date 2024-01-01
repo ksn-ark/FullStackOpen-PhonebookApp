@@ -16,8 +16,23 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+  },
+  number: {
+    type: String,
+    minLength: 8,
+    validate: {
+      validator: (value) => {
+        const regex = /^\d+-\d+$/;
+        return regex.test(value);
+      },
+      message: 'Number must be in the format: digits+"-"+digits',
+    },
+    required: true,
+  },
 });
 
 personSchema.set("toJSON", {
