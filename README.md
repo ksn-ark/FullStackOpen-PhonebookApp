@@ -1,2 +1,2 @@
-# FullStackOpen-Part-3
-Course work for full stack open part 3
+# FullStackOpen-PhonebookApp
+Exercise Application for full stack open
